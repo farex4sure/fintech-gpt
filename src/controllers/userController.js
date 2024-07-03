@@ -19,7 +19,7 @@ async function getUserInfo(req, res) {
             });
         }
 
-        const users = await models.user.findOne({
+        const users = await models.user.findAll({
             where: { phone: id }
         });
 
