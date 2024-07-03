@@ -256,9 +256,66 @@ async function getTransaction(req, res) {
 }
 
 
+
+async function addBeneficiary(req, res) {
+    try {
+
+        // Validate input
+        const schema = {
+            userid: { type: "string", optional: false, max: "100" },
+            acc_name: { type: "string", optional: false, max: "100" },
+            acc_num: { type: "string", optional: false, max: "100" },
+            bank_name: { type: "string", optional: true, max: "100" },
+            bank_code: { type: "number", optional: true, }
+        };
+
+        const v = new Validator();
+        const validationResponse = v.validate(req.body, schema);
+
+        if (validationResponse !== true) {
+            return res.status(400).json({
+                message: "Validation failed",
+                errors: validationResponse
+            });
+        }
+
+        const beneficiary = {
+            userid: req.body.userid,
+            acc_name: req.body.acc_name,
+            acc_num: req.body.acc_num,
+            bank_name: req.body.bank_name,
+            bank_code: req.body.bank_code,
+            status: 0
+        };
+
+        // Check if email or phone number already exists
+        const checkBeneficiary = await models.beneficiary.findAll({ where: { userid: req.body.userid, acc_num: req.body.acc_num  } });
+        if (checkBeneficiary) {
+            return res.status(200).json({
+                message: "beneficiary added"
+            });
+        }
+
+        // Save user to the database
+        await models.beneficiary.create(beneficiary);
+        res.status(200).json({
+            message: "beneficiary added"
+        });
+
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({
+            message: "Something went wrong",
+            error: error.message
+        });
+    }
+}
+
+
 module.exports = {
     getUserInfo: getUserInfo,
     signUp:signUp,
     transfer: transfer,
-    getTransaction: getTransaction
+    getTransaction: getTransaction,
+    addBeneficiary: addBeneficiary
 }
