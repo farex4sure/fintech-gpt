@@ -312,10 +312,46 @@ async function addBeneficiary(req, res) {
 }
 
 
+
+async function getBeneficiary(req, res) {
+    try {
+        // get the id
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({
+                message: "Invalid or missing user id"
+            });
+        }
+
+        const beneficiary = await models.beneficiary.findAll({
+            where: { phone: id },
+            order: [['id', 'DESC']]
+        });
+
+        if (beneficiary && beneficiary.length > 0) {
+            return res.status(200).json({
+                beneficiaries: beneficiary
+            });
+        } else {
+            return res.status(404).json({
+                message: "beneficiary not found"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: "something went wrong",
+            error: error.message
+        });
+    }
+}
+
+
 module.exports = {
     getUserInfo: getUserInfo,
     signUp:signUp,
     transfer: transfer,
     getTransaction: getTransaction,
-    addBeneficiary: addBeneficiary
+    addBeneficiary: addBeneficiary,
+    getBeneficiary: getBeneficiary
 }

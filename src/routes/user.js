@@ -10,5 +10,6 @@ router.post("/transfer", userController.transfer);
 router.get("/getTransactions/:id", userController.getTransaction);
 router.get("/getUserInfo/:id", userController.getUserInfo);
 router.post("/addBeneficiary", userController.addBeneficiary);
+router.get("/getBeneficiary/:id", userController.getBeneficiary);
 
 module.exports = router;
