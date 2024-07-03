@@ -153,7 +153,7 @@ async function transfer(req, res) {
 
         // the transaction details body
         const transact = {
-            userid: req.body.phone,
+            userid: req.body.sender,
             sender: req.body.sender,
             receiver: req.body.receiver,
             amount: req.body.amount,
@@ -179,7 +179,43 @@ async function transfer(req, res) {
     }
 }
 
+
+
+async function getTransaction(req, res) {
+    try {
+        // get the id
+        const id = req.params.id;
+
+        const transactions = await models.transaction.findAll({
+            where: {
+                [Op.or]: [
+                    { sender: id },
+                    { receiver: id }
+                ]
+            },
+            order: [['id', 'DESC']]
+        });
+
+        if (transactions && transactions.length > 0) {
+            return res.status(200).json({
+                transaction: transactions
+            });
+        } else {
+            return res.status(404).json({
+                message: "transaction not found"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: "something went wrong",
+            error: error.message
+        });
+    }
+}
+
+
 module.exports = {
     signUp:signUp,
-    transfer: transfer
+    transfer: transfer,
+    getTransaction: getTransaction
 }

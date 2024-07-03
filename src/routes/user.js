@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.post("/signup", userController.signUp);
 router.post("/transfer", userController.transfer);
+router.post("/getTransactions", userController.getTransaction);
 
 module.exports = router;
