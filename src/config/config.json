@@ -1,0 +1,23 @@
+{
+    "development": {
+      "username": "root",
+      "password": null,
+      "database": "fintech-gpt",
+      "host": "127.0.0.1",
+      "dialect": "mysql"
+    },
+    "test": {
+      "username": "root",
+      "password": null,
+      "database": "database_test",
+      "host": "127.0.0.1",
+      "dialect": "mysql"
+    },
+    "production": {
+      "username": "uiopv1sqhdn3cqqf",
+      "password": "Cgvj1DFEaWB6VGXwuXEM",
+      "database": "bq90qukptqt0fddpniuj",
+      "host": "bq90qukptqt0fddpniuj-mysql.services.clever-cloud.com",
+      "dialect": "mysql"
+    }
+  }
