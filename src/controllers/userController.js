@@ -149,7 +149,7 @@ async function transfer(req, res) {
         }
 
         // Get the user account
-        const getUserAccount = await models.user.findOne({ where: { phone: send.sender } });
+        const getUserAccount = await models.user.findOne({ where: { userid: send.sender } });
 
         if (getUserAccount) {
             if(getUserAccount.balance < send.amount){
@@ -168,7 +168,7 @@ async function transfer(req, res) {
         // Update send balance
         await models.user.update(
             { balance: newSBal },
-            { where: { phone: send.sender } }
+            { where: { userid: send.sender } }
           );
 
         //   Update receiver balance
@@ -228,11 +228,22 @@ async function getTransaction(req, res) {
             });
         }
 
+        // Get the user account
+        const getUserAccount = await models.user.findOne({ where: { userid: id } });
+
+        // if (getUserAccount) {
+        //     if(getUserAccount.balance < send.amount){
+        //         return res.status(507).json({
+        //             message: "Insufficient balance"
+        //         });
+        //     }
+        // }
+
         const transactions = await models.transaction.findAll({
             where: {
                 [Op.or]: [
                     { sender: id },
-                    { receiver: id }
+                    { receiver: getUserAccount.phone }
                 ]
             },
             order: [['id', 'DESC']]
@@ -325,7 +336,7 @@ async function getBeneficiary(req, res) {
         }
 
         const beneficiary = await models.beneficiary.findAll({
-            where: { phone: id },
+            where: { userid: id },
             order: [['id', 'DESC']]
         });
 
