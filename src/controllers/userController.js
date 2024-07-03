@@ -108,7 +108,7 @@ async function transfer(req, res) {
 
         // Check if phone number already exists
         const phoneExists = await models.user.findOne({ where: { phone: send.receiver } });
-        if (phoneExists) {
+        if (!phoneExists) {
             return res.status(409).json({ message: "Receiver's number does not exist" });
         }
 
