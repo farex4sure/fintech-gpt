@@ -13,7 +13,13 @@ async function getUserInfo(req, res) {
         // get the id
         const id = req.params.id;
 
-        const users = await models.user.findAll({
+        if (!id) {
+            return res.status(400).json({
+                message: "Invalid or missing user id"
+            });
+        }
+
+        const users = await models.user.findOne({
             where: { phone: id }
         });
 
@@ -215,6 +221,12 @@ async function getTransaction(req, res) {
     try {
         // get the id
         const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({
+                message: "Invalid or missing user id"
+            });
+        }
 
         const transactions = await models.transaction.findAll({
             where: {
