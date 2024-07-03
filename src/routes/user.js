@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/signup", userController.signUp);
 router.post("/transfer", userController.transfer);
-router.get("/getTransactions", userController.getTransaction);
-router.get("/getUserInfo", userController.getUserInfo);
+router.get("/getTransactions/:id", userController.getTransaction);
+router.get("/getUserInfo/:id", userController.getUserInfo);
 
 module.exports = router;
