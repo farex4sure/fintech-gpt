@@ -6,6 +6,36 @@ require("dotenv").config();
 const { Op, Sequelize, fn, col, literal } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 
+
+
+async function getUserInfo(req, res) {
+    try {
+        // get the id
+        const id = req.params.id;
+
+        const users = await models.user.findAll({
+            where: { phone: id }
+        });
+
+        if (users && users.length > 0) {
+            return res.status(200).json({
+                details: users
+            });
+        } else {
+            return res.status(404).json({
+                message: "user not found"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: "something went wrong",
+            error: error.message
+        });
+    }
+}
+
+
+
 async function signUp(req, res) {
     try {
 
@@ -215,6 +245,7 @@ async function getTransaction(req, res) {
 
 
 module.exports = {
+    getUserInfo: getUserInfo,
     signUp:signUp,
     transfer: transfer,
     getTransaction: getTransaction
