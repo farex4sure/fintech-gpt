@@ -20,7 +20,7 @@ async function getUserInfo(req, res) {
         }
 
         const users = await models.user.findAll({
-            where: { phone: id }
+            where: { userid: id }
         });
 
         if (users && users.length > 0) {
