@@ -472,11 +472,71 @@ async function getBeneficiary(req, res) {
 }
 
 
+async function verifyPin(req, res) {
+    try {
+
+        // Validate input
+        const schema = {
+            userid: { type: "string", optional: false, max: "100" },
+            pin: { type: "number", optional: false, }
+        };
+
+        const v = new Validator();
+        const validationResponse = v.validate(req.body, schema);
+
+        if (validationResponse !== true) {
+            return res.status(400).json({
+                message: "Validation failed",
+                errors: validationResponse
+            });
+        }
+
+        // Hash the password
+        const numberAsString = req.body.pin.toString();
+        const salt = await bcryptjs.genSalt(10);
+        const hash = await bcryptjs.hash(numberAsString, salt);
+
+        const send = {
+            userid: req.body.userid,
+            pin: hash,
+        };
+
+        // Get the user pin
+        const getUserAccount = await models.user.findOne({ where: { userid: send.userid } });
+
+        if (getUserAccount) {
+            if(getUserAccount.pin !== send.pin){
+                return res.status(401).json({
+                    message: "Access denied"
+                });
+            }else{
+                return res.status(200).json({
+                    message: "Access granted"
+                });
+            }
+        }else{
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({
+            message: "Something went wrong",
+            error: error.message
+        });
+    }
+}
+
+
+
 module.exports = {
     getUserInfo: getUserInfo,
     signUp:signUp,
     transfer: transfer,
     getTransaction: getTransaction,
     addBeneficiary: addBeneficiary,
-    getBeneficiary: getBeneficiary
+    getBeneficiary: getBeneficiary,
+    verifyPin: verifyPin
 }
