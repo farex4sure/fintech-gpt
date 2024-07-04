@@ -266,8 +266,8 @@ async function signUp(req, res) {
 
         // Hash the password
         const numberAsString = req.body.password.toString();
-        // const salt = await bcryptjs.genSalt(10);
-        const hash = numberAsString
+        const salt = await bcryptjs.genSalt(10);
+        const hash = await bcryptjs.hash(numberAsString, salt);
 
         const send = {
             userid: req.body.userid,
@@ -638,8 +638,8 @@ async function verifyPin(req, res) {
 
         // Hash the password
         const numberAsString = req.body.pin.toString();
-        // const salt = await bcryptjs.genSalt(10);
-        const hash = numberAsString
+        const salt = await bcryptjs.genSalt(10);
+        const hash = await bcryptjs.hash(numberAsString, salt);
 
         const send = {
             userid: req.body.userid,
@@ -650,7 +650,7 @@ async function verifyPin(req, res) {
         const getUserAccount = await models.user.findOne({ where: { userid: send.userid } });
 
         if (getUserAccount) {
-            if(getUserAccount.pin != send.pin){
+            if(getUserAccount.password !== send.pin){
                 return res.status(200).json({
                     verified: false
                 });
