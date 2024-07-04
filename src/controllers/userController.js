@@ -51,7 +51,8 @@ async function signUp(req, res) {
             fullname: { type: "string", optional: false, max: "100" },
             email: { type: "string", optional: false, max: "100" },
             phone: { type: "string", optional: false, max: "100" },
-            password: { type: "number", optional: false, }
+            password: { type: "number", optional: false, },
+            image: { type: "string", optional: false, }
         };
 
         const v = new Validator();
@@ -76,6 +77,7 @@ async function signUp(req, res) {
             phone: req.body.phone,
             password: hash,
             balance: 0,
+            image: req.body.image,
             status: 0
         };
 

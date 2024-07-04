@@ -27,6 +27,9 @@ module.exports = {
       balance: {
         type: Sequelize.INTEGER
       },
+      image: {
+        type: Sequelize.STRING
+      },
       status: {
         type: Sequelize.INTEGER
       },
