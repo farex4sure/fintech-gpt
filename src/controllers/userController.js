@@ -651,7 +651,7 @@ async function verifyPin(req, res) {
 
         if (getUserAccount) {
             if(getUserAccount.pin !== send.pin){
-                return res.status(401).json({
+                return res.status(404).json({
                     message: "Access denied"
                 });
             }else{
