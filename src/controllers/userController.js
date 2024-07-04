@@ -229,6 +229,7 @@ async function transfer(req, res) {
             sender: { type: "string", optional: false, max: "100" },
             receiver: { type: "string", optional: false, max: "100" },
             amount: { type: "number", optional: false, },
+            narration: { type: "string", optional: true, },
             pin: { type: "number", optional: false, }
         };
 
@@ -251,6 +252,7 @@ async function transfer(req, res) {
             sender: req.body.sender,
             receiver: req.body.receiver,
             amount: req.body.amount,
+            narration: req.body.narration,
             pin: hash,
         };
 

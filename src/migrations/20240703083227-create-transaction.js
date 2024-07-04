@@ -24,6 +24,9 @@ module.exports = {
       refid: {
         type: Sequelize.STRING
       },
+      narration: {
+        type: Sequelize.STRING
+      },
       date: {
         type: Sequelize.STRING
       },

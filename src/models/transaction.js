@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     receiver: DataTypes.STRING,
     amount: DataTypes.INTEGER,
     refid: DataTypes.STRING,
+    narration: DataTypes.STRING,
     date: DataTypes.STRING
   }, {
     sequelize,
