@@ -115,13 +115,13 @@ async function getUserInfo(req, res) {
 
         // Attach images to beneficiaries
         const updatedBeneficiaries = await Promise.all(beneficiaries.map(async (beneficiary) => {
-            const user = await models.user.findAll({
+            const user = await models.user.findOne({
                 where: { phone: beneficiary.acc_num }
             });
             if (user && user.image) {
                 beneficiary.image = user.image; // Assuming the image field in the user table is 'image'
             } else {
-                beneficiary.image = null; // or set a default image
+                beneficiary.image = ""; // or set a default image
             }
             return beneficiary;
         }));
