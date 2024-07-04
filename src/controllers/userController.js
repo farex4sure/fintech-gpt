@@ -477,7 +477,7 @@ async function addBeneficiary(req, res) {
             acc_name: { type: "string", optional: false, max: "100" },
             acc_num: { type: "string", optional: false, max: "100" },
             bank_name: { type: "string", optional: true, max: "100" },
-            bank_code: { type: "number", optional: true, }
+            bank_code: { type: "string", optional: true, }
         };
 
         const v = new Validator();
