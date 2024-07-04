@@ -152,6 +152,9 @@ async function getUserInfo(req, res) {
                 ...transaction.toJSON(), // Convert to plain object
                 senderName: senderUser ? senderUser.fullname : null,
                 receiverName: receiverUser ? receiverUser.fullname : null,
+
+                senderPic: senderUser ? senderUser.image : null,
+                receiverPic: receiverUser ? receiverUser.image : null,
                 isCredit: transaction.sender !== id // Determine if the transaction is a credit
             };
         }));
