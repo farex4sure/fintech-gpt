@@ -650,7 +650,7 @@ async function verifyPin(req, res) {
         const getUserAccount = await models.user.findOne({ where: { userid: send.userid } });
 
         if (getUserAccount) {
-            if(getUserAccount.pin !== send.pin){
+            if(getUserAccount.pin != send.pin){
                 return res.status(200).json({
                     verified: false
                 });
