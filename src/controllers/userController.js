@@ -113,8 +113,8 @@ async function getUserInfo(req, res) {
             order: [['id', 'DESC']]
         });
 
-        // Attach images to beneficiaries
-        for (const beneficiary of beneficiaries) {
+         // Attach images to beneficiaries
+         await Promise.all(beneficiaries.map(async (beneficiary) => {
             const user = await models.user.findOne({
                 where: { phone: beneficiary.acc_num }
             });
@@ -123,7 +123,7 @@ async function getUserInfo(req, res) {
             } else {
                 beneficiary.image = null; // or set a default image
             }
-        }
+        }));
 
         // User transactions
         const getUserAccount = await models.user.findOne({ where: { userid: id } });
