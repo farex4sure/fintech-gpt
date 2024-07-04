@@ -157,8 +157,8 @@ async function getUserInfo(req, res) {
         }));
 
         // Log updated beneficiaries and transactions for debugging
-        console.log(updatedBeneficiaries);
-        console.log(updatedTransactions);
+        // console.log(updatedBeneficiaries);
+        // console.log(updatedTransactions);
 
         return res.status(200).json({
             details: users,
