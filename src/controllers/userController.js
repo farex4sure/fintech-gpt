@@ -93,7 +93,7 @@ const { v4: uuidv4 } = require('uuid');
 
 async function getUserInfo(req, res) {
     try {
-        // get the id
+        // Get the id
         const id = req.params.id;
 
         if (!id) {
@@ -118,12 +118,11 @@ async function getUserInfo(req, res) {
             const user = await models.user.findOne({
                 where: { phone: beneficiary.acc_num }
             });
-            if (user && user.image) {
-                beneficiary.image = user.image; // Assuming the image field in the user table is 'image'
-            } else {
-                beneficiary.image = ""; // or set a default image
-            }
-            return beneficiary;
+            // Create a new object with the image field
+            return {
+                ...beneficiary.toJSON(), // Convert to plain object
+                image: user && user.image ? user.image : null // or set a default image
+            };
         }));
 
         // User transactions
@@ -139,10 +138,32 @@ async function getUserInfo(req, res) {
             order: [['id', 'DESC']]
         });
 
+        // Attach sender and receiver names and isCredit field to transactions
+        const updatedTransactions = await Promise.all(transactions.map(async (transaction) => {
+            const senderUser = await models.user.findOne({
+                where: { userid: transaction.sender }
+            });
+
+            const receiverUser = await models.user.findOne({
+                where: { phone: transaction.receiver }
+            });
+
+            return {
+                ...transaction.toJSON(), // Convert to plain object
+                senderName: senderUser ? senderUser.fullname : null,
+                receiverName: receiverUser ? receiverUser.fullname : null,
+                isCredit: transaction.sender !== id // Determine if the transaction is a credit
+            };
+        }));
+
+        // Log updated beneficiaries and transactions for debugging
+        console.log(updatedBeneficiaries);
+        console.log(updatedTransactions);
+
         return res.status(200).json({
             details: users,
             beneficiaries: updatedBeneficiaries,
-            transactions: transactions
+            transactions: updatedTransactions
         });
     } catch (error) {
         return res.status(500).json({
@@ -151,6 +172,8 @@ async function getUserInfo(req, res) {
         });
     }
 }
+
+
 
 
 
