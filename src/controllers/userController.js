@@ -41,6 +41,56 @@ const { v4: uuidv4 } = require('uuid');
 // }
 
 
+// async function getUserInfo(req, res) {
+//     try {
+//         // get the id
+//         const id = req.params.id;
+
+//         if (!id) {
+//             return res.status(400).json({
+//                 message: "Invalid or missing user id"
+//             });
+//         }
+
+//         // User details
+//         const users = await models.user.findAll({
+//             where: { userid: id }
+//         });
+
+//         // User beneficiary
+//         const beneficiary = await models.beneficiary.findAll({
+//             where: { userid: id },
+//             order: [['id', 'DESC']]
+//         });
+
+//         // User transactions
+//         const getUserAccount = await models.user.findOne({ where: { userid: id } });
+
+//         const transactions = await models.transaction.findAll({
+//             where: {
+//                 [Op.or]: [
+//                     { sender: id },
+//                     { receiver: getUserAccount.phone }
+//                 ]
+//             },
+//             order: [['id', 'DESC']]
+//         });
+
+        
+//             return res.status(200).json({
+//                 details: users,
+//                 beneficiaries: beneficiary,
+//                 transaction: transactions
+//             });
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: "something went wrong",
+//             error: error.message
+//         });
+//     }
+// }
+
+
 async function getUserInfo(req, res) {
     try {
         // get the id
@@ -58,10 +108,22 @@ async function getUserInfo(req, res) {
         });
 
         // User beneficiary
-        const beneficiary = await models.beneficiary.findAll({
+        const beneficiaries = await models.beneficiary.findAll({
             where: { userid: id },
             order: [['id', 'DESC']]
         });
+
+        // Attach images to beneficiaries
+        for (const beneficiary of beneficiaries) {
+            const user = await models.user.findOne({
+                where: { phone: beneficiary.acc_num }
+            });
+            if (user && user.image) {
+                beneficiary.image = user.image; // Assuming the image field in the user table is 'image'
+            } else {
+                beneficiary.image = null; // or set a default image
+            }
+        }
 
         // User transactions
         const getUserAccount = await models.user.findOne({ where: { userid: id } });
@@ -76,12 +138,11 @@ async function getUserInfo(req, res) {
             order: [['id', 'DESC']]
         });
 
-        
-            return res.status(200).json({
-                details: users,
-                beneficiaries: beneficiary,
-                transaction: transactions
-            });
+        return res.status(200).json({
+            details: users,
+            beneficiaries: beneficiaries,
+            transactions: transactions
+        });
     } catch (error) {
         return res.status(500).json({
             message: "something went wrong",
@@ -89,7 +150,6 @@ async function getUserInfo(req, res) {
         });
     }
 }
-
 
 
 async function signUp(req, res) {
