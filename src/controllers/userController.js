@@ -8,6 +8,39 @@ const { v4: uuidv4 } = require('uuid');
 
 
 
+// async function getUserInfo(req, res) {
+//     try {
+//         // get the id
+//         const id = req.params.id;
+
+//         if (!id) {
+//             return res.status(400).json({
+//                 message: "Invalid or missing user id"
+//             });
+//         }
+
+//         const users = await models.user.findAll({
+//             where: { userid: id }
+//         });
+
+//         if (users && users.length > 0) {
+//             return res.status(200).json({
+//                 details: users
+//             });
+//         } else {
+//             return res.status(404).json({
+//                 message: "user not found"
+//             });
+//         }
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: "something went wrong",
+//             error: error.message
+//         });
+//     }
+// }
+
+
 async function getUserInfo(req, res) {
     try {
         // get the id
@@ -19,19 +52,36 @@ async function getUserInfo(req, res) {
             });
         }
 
+        // User details
         const users = await models.user.findAll({
             where: { userid: id }
         });
 
-        if (users && users.length > 0) {
+        // User beneficiary
+        const beneficiary = await models.beneficiary.findAll({
+            where: { userid: id },
+            order: [['id', 'DESC']]
+        });
+
+        // User transactions
+        const getUserAccount = await models.user.findOne({ where: { userid: id } });
+
+        const transactions = await models.transaction.findAll({
+            where: {
+                [Op.or]: [
+                    { sender: id },
+                    { receiver: getUserAccount.phone }
+                ]
+            },
+            order: [['id', 'DESC']]
+        });
+
+        
             return res.status(200).json({
-                details: users
+                details: users,
+                beneficiaries: beneficiary,
+                transaction: transactions
             });
-        } else {
-            return res.status(404).json({
-                message: "user not found"
-            });
-        }
     } catch (error) {
         return res.status(500).json({
             message: "something went wrong",
