@@ -8,89 +8,6 @@ const { v4: uuidv4 } = require('uuid');
 
 
 
-// async function getUserInfo(req, res) {
-//     try {
-//         // get the id
-//         const id = req.params.id;
-
-//         if (!id) {
-//             return res.status(400).json({
-//                 message: "Invalid or missing user id"
-//             });
-//         }
-
-//         const users = await models.user.findAll({
-//             where: { userid: id }
-//         });
-
-//         if (users && users.length > 0) {
-//             return res.status(200).json({
-//                 details: users
-//             });
-//         } else {
-//             return res.status(404).json({
-//                 message: "user not found"
-//             });
-//         }
-//     } catch (error) {
-//         return res.status(500).json({
-//             message: "something went wrong",
-//             error: error.message
-//         });
-//     }
-// }
-
-
-// async function getUserInfo(req, res) {
-//     try {
-//         // get the id
-//         const id = req.params.id;
-
-//         if (!id) {
-//             return res.status(400).json({
-//                 message: "Invalid or missing user id"
-//             });
-//         }
-
-//         // User details
-//         const users = await models.user.findAll({
-//             where: { userid: id }
-//         });
-
-//         // User beneficiary
-//         const beneficiary = await models.beneficiary.findAll({
-//             where: { userid: id },
-//             order: [['id', 'DESC']]
-//         });
-
-//         // User transactions
-//         const getUserAccount = await models.user.findOne({ where: { userid: id } });
-
-//         const transactions = await models.transaction.findAll({
-//             where: {
-//                 [Op.or]: [
-//                     { sender: id },
-//                     { receiver: getUserAccount.phone }
-//                 ]
-//             },
-//             order: [['id', 'DESC']]
-//         });
-
-        
-//             return res.status(200).json({
-//                 details: users,
-//                 beneficiaries: beneficiary,
-//                 transaction: transactions
-//             });
-//     } catch (error) {
-//         return res.status(500).json({
-//             message: "something went wrong",
-//             error: error.message
-//         });
-//     }
-// }
-
-
 async function getUserInfo(req, res) {
     try {
         // Get the id
@@ -176,69 +93,6 @@ async function getUserInfo(req, res) {
     }
 }
 
-
-
-
-
-// async function getUserInfo(req, res) {
-//     try {
-//         // get the id
-//         const id = req.params.id;
-
-//         if (!id) {
-//             return res.status(400).json({
-//                 message: "Invalid or missing user id"
-//             });
-//         }
-
-//         // User details
-//         const users = await models.user.findAll({
-//             where: { userid: id }
-//         });
-
-//         // User beneficiary
-//         const beneficiaries = await models.beneficiary.findAll({
-//             where: { userid: id },
-//             order: [['id', 'DESC']]
-//         });
-
-//          // Attach images to beneficiaries
-//          await Promise.all(beneficiaries.map(async (beneficiary) => {
-//             const user = await models.user.findOne({
-//                 where: { phone: beneficiary.acc_num }
-//             });
-//             if (user && user.image) {
-//                 beneficiary.image = user.image; // Assuming the image field in the user table is 'image'
-//             } else {
-//                 beneficiary.image = null; // or set a default image
-//             }
-//         }));
-
-//         // User transactions
-//         const getUserAccount = await models.user.findOne({ where: { userid: id } });
-
-//         const transactions = await models.transaction.findAll({
-//             where: {
-//                 [Op.or]: [
-//                     { sender: id },
-//                     { receiver: getUserAccount.phone }
-//                 ]
-//             },
-//             order: [['id', 'DESC']]
-//         });
-
-//         return res.status(200).json({
-//             details: users,
-//             beneficiaries: beneficiaries,
-//             transactions: transactions
-//         });
-//     } catch (error) {
-//         return res.status(500).json({
-//             message: "something went wrong",
-//             error: error.message
-//         });
-//     }
-// }
 
 
 async function signUp(req, res) {
@@ -401,10 +255,14 @@ async function transfer(req, res) {
         };
 
         // Save transaction to the database
-        await models.transaction.create(transact);
+        // await models.transaction.create(transact);
+
+        // Save transaction to the database
+        const newTransaction = await models.transaction.create(transact);
 
         return res.status(200).json({
-            message: "Transaction Successfull"
+            // message: "Transaction Successfull",
+            transaction: newTransaction
         });
 
         
@@ -471,60 +329,6 @@ async function getTransaction(req, res) {
 
 
 
-// async function addBeneficiary(req, res) {
-//     try {
-
-//         // Validate input
-//         const schema = {
-//             userid: { type: "string", optional: false, max: "100" },
-//             acc_name: { type: "string", optional: false, max: "100" },
-//             acc_num: { type: "string", optional: false, max: "100" },
-//             bank_name: { type: "string", optional: true, max: "100" },
-//             bank_code: { type: "string", optional: true, }
-//         };
-
-//         const v = new Validator();
-//         const validationResponse = v.validate(req.body, schema);
-
-//         if (validationResponse !== true) {
-//             return res.status(400).json({
-//                 message: "Validation failed",
-//                 errors: validationResponse
-//             });
-//         }
-
-//         const beneficiary = {
-//             userid: req.body.userid,
-//             acc_name: req.body.acc_name,
-//             acc_num: req.body.acc_num,
-//             bank_name: req.body.bank_name,
-//             bank_code: req.body.bank_code,
-//             status: 0
-//         };
-
-//         // Check if email or phone number already exists
-//         const checkBeneficiary = await models.beneficiary.findAll({ where: { userid: req.body.userid, acc_num: req.body.acc_num  } });
-//         if (checkBeneficiary) {
-//             return res.status(200).json({
-//                 message: "beneficiary added"
-//             });
-//         }
-
-//         // Save user to the database
-//         await models.beneficiary.create(beneficiary);
-//         res.status(200).json({
-//             message: "beneficiary added"
-//         });
-
-//     } catch (error) {
-//         console.error('Error:', error);
-//         res.status(500).json({
-//             message: "Something went wrong",
-//             error: error.message
-//         });
-//     }
-// }
-
 async function addBeneficiary(req, res) {
     try {
         // Validate input
@@ -582,7 +386,6 @@ async function addBeneficiary(req, res) {
 
 
 
-
 async function getBeneficiary(req, res) {
     try {
         // get the id
@@ -615,6 +418,7 @@ async function getBeneficiary(req, res) {
         });
     }
 }
+
 
 
 async function verifyPin(req, res) {
