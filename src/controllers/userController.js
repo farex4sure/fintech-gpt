@@ -166,14 +166,13 @@ async function signUp(req, res) {
 
 async function transfer(req, res) {
     try {
-
         // Validate input
         const schema = {
             sender: { type: "string", optional: false, max: "100" },
             receiver: { type: "string", optional: false, max: "100" },
-            amount: { type: "number", optional: false, },
-            narration: { type: "string", optional: true, },
-            pin: { type: "number", optional: false, }
+            amount: { type: "number", optional: false },
+            narration: { type: "string", optional: true },
+            pin: { type: "number", optional: false }
         };
 
         const v = new Validator();
@@ -186,65 +185,65 @@ async function transfer(req, res) {
             });
         }
 
-        // Hash the password
+        // Hash the PIN
         const numberAsString = req.body.pin.toString();
-        const salt = await bcryptjs.genSalt(10);
-        const hash = await bcryptjs.hash(numberAsString, salt);
+        // const salt = await bcryptjs.genSalt(10);
+        const hash = numberAsString
 
         const send = {
             sender: req.body.sender,
             receiver: req.body.receiver,
             amount: req.body.amount,
             narration: req.body.narration,
-            pin: hash,
+            pin: hash
         };
 
-        // Check if phone number already exists
+        // Check if receiver's phone number exists
         const phoneExists = await models.user.findOne({ where: { phone: send.receiver } });
         if (!phoneExists) {
             return res.status(409).json({ message: "Receiver's number does not exist" });
         }
 
-        // Get the user account
+        // Get the sender's user account
         const getUserAccount = await models.user.findOne({ where: { userid: send.sender } });
 
         if (getUserAccount) {
-            if(getUserAccount.balance < send.amount){
+            if (getUserAccount.balance < send.amount) {
                 return res.status(507).json({
                     message: "Insufficient balance"
                 });
             }
         }
 
-        // sender new balance
-        const newSBal = getUserAccount.balance-send.amount;
+        if (hash !== getUserAccount.password ) {
+            return res.status(507).json({
+                message: "Incorrect Pin"
+            });
+        }
 
-        // receiver new balance
-        const newRBal = phoneExists.balance+send.amount;
+        // Calculate new balances
+        const newSBal = getUserAccount.balance - send.amount;
+        const newRBal = phoneExists.balance + send.amount;
 
-        // Update send balance
+        // Update sender's balance
         await models.user.update(
             { balance: newSBal },
             { where: { userid: send.sender } }
-          );
-
-        //   Update receiver balance
-        await models.user.update(
-        { balance: newRBal },
-        { where: { phone: send.receiver } }
         );
 
-        function generatePaymentRefId() {
-            return uuidv4();
-        }
+        // Update receiver's balance
+        await models.user.update(
+            { balance: newRBal },
+            { where: { phone: send.receiver } }
+        );
 
-        // generate reference id for the payment
-        const paymentRefId = generatePaymentRefId();
+        // Generate payment reference ID
+        const paymentRefId = uuidv4();
 
-        // get current time stamp
+        // Get current timestamp
         const currentUnixTimestamp = Math.floor(Date.now() / 1000);
 
-        // the transaction details body
+        // Create transaction object
         const transact = {
             userid: req.body.sender,
             sender: req.body.sender,
@@ -252,21 +251,30 @@ async function transfer(req, res) {
             amount: req.body.amount,
             refid: paymentRefId,
             narration: req.body.narration,
-            date: currentUnixTimestamp,
+            date: currentUnixTimestamp
         };
 
         // Save transaction to the database
-        // await models.transaction.create(transact);
+        const transaction = await models.transaction.create(transact);
 
-        // Save transaction to the database
-        const newTransaction = await models.transaction.create(transact);
+        // Get sender and receiver details
+        const senderUser = await models.user.findOne({ where: { userid: transaction.sender } });
+        const receiverUser = await models.user.findOne({ where: { phone: transaction.receiver } });
+
+        // Attach additional data to the transaction
+        const updatedTransaction = {
+            ...transaction.toJSON(),
+            senderName: senderUser ? senderUser.fullname : null,
+            receiverName: receiverUser ? receiverUser.fullname : null,
+            senderPic: senderUser ? senderUser.image : null,
+            receiverPic: receiverUser ? receiverUser.image : null,
+            isCredit: transaction.sender !== req.body.sender
+        };
 
         return res.status(200).json({
-            // message: "Transaction Successfull",
-            transaction: newTransaction
+            message: "Transaction Successful",
+            transaction: updatedTransaction
         });
-
-        
 
     } catch (error) {
         console.error('Error:', error);
@@ -276,6 +284,7 @@ async function transfer(req, res) {
         });
     }
 }
+
 
 
 
