@@ -272,7 +272,7 @@ async function transfer(req, res) {
         };
 
         return res.status(200).json({
-            message: "Transaction Successful",
+            // message: "Transaction Successful",
             transaction: updatedTransaction
         });
 
