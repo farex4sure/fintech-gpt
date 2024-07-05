@@ -251,6 +251,7 @@ async function transfer(req, res) {
             receiver: req.body.receiver,
             amount: req.body.amount,
             refid: paymentRefId,
+            narration: req.body.narration,
             date: currentUnixTimestamp,
         };
 
