@@ -5,6 +5,7 @@ const Validator = require('fastest-validator');
 require("dotenv").config();
 const { Op, Sequelize, fn, col, literal } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
+const nodemailer = require("nodemailer");
 
 
 
@@ -490,6 +491,226 @@ async function verifyPin(req, res) {
 
 
 
+// async function sendMail(req, res) {
+//     try {
+
+//         // Validate input
+//         const schema = {
+//             listofitems: { type: "string", optional: false, max: "100" },
+//             itemsimages: { type: "string", optional: false, max: "100" },
+//             dailycost: { type: "string", optional: false, max: "100" },
+//             delivery: { type: "string", optional: false, max: "100" },
+//             day: { type: "string", optional: false, max: "100" },
+//             total: { type: "string", optional: false, max: "100" }
+//         };
+
+//         const v = new Validator();
+//         const validationResponse = v.validate(req.body, schema);
+
+//         if (validationResponse !== true) {
+//             return res.status(400).json({
+//                 message: "Validation failed",
+//                 errors: validationResponse
+//             });
+//         }
+
+//         // Transporter setup using environment variables for security
+//         let transporter = nodemailer.createTransport({
+//             host: 'saudinnov.sa',
+//             port: 465,
+//             secure: true, // true for 465, false for other ports
+//             auth: {
+//                 user: 'shop@saudinnov.sa', // your email address
+//                 pass: 'k,r]K8-Ws(y7' // your email password
+//             }
+//         });
+//         // const transporter = nodemailer.createTransport({
+//         //     service: 'gmail',
+//         //     auth: {
+//         //         user: 'faruqhassan176@gmail.com',
+//         //         pass: 'zczpgharpqurijsa'
+//         //     }
+//         // });
+
+//         const mailOptions = {
+//             from: 'shop@saudinnov.sa',
+//             to: req.body.email,
+//             subject: 'New Rent',
+            
+//             // Your OTP for registration is: ${otp},
+//             html: `
+//             <!DOCTYPE html>
+//             <html>
+//             <body>
+//                 <div style="width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; font-family: Arial, sans-serif;">
+//                     <h2 style="text-align: left; font-size: 18px; margin-bottom: 20px;">Order Summary</h2>
+//                     <label for="days" style="display: block; margin-bottom: 5px;">Day(s)</label>
+//                     <input type="text" id="days" name="days" value="1" readonly style="width: 100%; padding: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+//                     <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+//                         <span>Daily Cost:</span>
+//                         <span>SAR 3137.00</span>
+//                     </div>
+//                     <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+//                         <span>Delivery:</span>
+//                         <span>SAR 50.00</span>
+//                     </div>
+//                     <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+//                         <span>Day(s):</span>
+//                         <span>1</span>
+//                     </div>
+//                     <div class="cost-item total" style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px;">
+//                         <span>Total:</span>
+//                         <span>SAR 3187.00</span>
+//                     </div>
+//                     <button type="button" style="width: 100%; padding: 10px; background-color: #007B55; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Checkout</button>
+//                 </div>
+//             </body>
+//             </html>
+
+//             `
+//         };
+
+//         transporter.sendMail(mailOptions, (error, info) => {
+//             if (error) {
+//                 console.log(error);
+//             } else {
+
+//                 models.otp.destroy({where: {email:req.body.email}}).then(result => {
+//                     models.otp.create(send).then(result => {
+//                         res.status(200).json({
+//                             message: "OTP has been successfully sent"
+//                         });
+//                     }).catch(error => {
+//                         res.status(500).json({
+//                             message: "Something went wrong",
+//                             error: error
+//                         });
+//                     });
+//                 })
+//             }
+//         })
+        
+//     } catch (error) {
+//         console.error('Error:', error);
+//         res.status(500).json({
+//             message: "Something went wrong",
+//             error: error.message
+//         });
+//     }
+// }
+
+
+async function sendMail(req, res) {
+    try {
+        // Validate input
+        const schema = {
+            listofitems: { type: "array", items: "string", optional: false },
+            itemsimages: { type: "array", items: "string", optional: false },
+            dailycost: { type: "string", optional: false, max: 100 },
+            delivery: { type: "string", optional: false, max: 100 },
+            day: { type: "string", optional: false, max: 100 },
+            total: { type: "string", optional: false, max: 100 },
+            email: { type: "email", optional: false }
+        };
+
+        const v = new Validator();
+        const validationResponse = v.validate(req.body, schema);
+
+        if (validationResponse !== true) {
+            return res.status(400).json({
+                message: "Validation failed",
+                errors: validationResponse
+            });
+        }
+
+        // Transporter setup using environment variables for security
+        // let transporter = nodemailer.createTransport({
+        //     host: 'saudinnov.sa',
+        //     port: 465,
+        //     secure: true, // true for 465, false for other ports
+        //     auth: {
+        //         user: 'shop@saudinnov.sa', // your email address
+        //         pass: 'k,r]K8-Ws(y7' // your email password
+        //     }
+        // });
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'faruqhassan176@gmail.com',
+                pass: 'zczpgharpqurijsa'
+            }
+        });
+
+        // Generate items list HTML
+        let itemsHtml = '';
+        req.body.listofitems.forEach((item, index) => {
+            itemsHtml += `
+                <div style="margin-bottom: 10px;">
+                    <img src="${req.body.itemsimages[index]}" alt="Item Image" style="max-width: 100px; max-height: 100px;">
+                    <p>${item}</p>
+                </div>
+            `;
+        });
+
+        const mailOptions = {
+            from: 'shop@saudinnov.sa',
+            to: req.body.email,
+            subject: 'New Rent',
+            html: `
+            <!DOCTYPE html>
+            <html>
+            <body>
+                <div style="width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; font-family: Arial, sans-serif;">
+                    <h2 style="text-align: left; font-size: 18px; margin-bottom: 20px;">Order Summary</h2>
+                    ${itemsHtml}
+                    <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Daily Cost:</span>
+                        <span>${req.body.dailycost}</span>
+                    </div>
+                    <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Delivery:</span>
+                        <span>${req.body.delivery}</span>
+                    </div>
+                    <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Day(s):</span>
+                        <span>${req.body.day}</span>
+                    </div>
+                    <div class="cost-item total" style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px;">
+                        <span>Total:</span>
+                        <span>${req.body.total}</span>
+                    </div>
+                    <button type="button" style="width: 100%; padding: 10px; background-color: #007B55; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Checkout</button>
+                </div>
+            </body>
+            </html>
+            `
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                return res.status(500).json({
+                    message: "Failed to send email",
+                    error: error
+                });
+            } else {
+                res.status(200).json({
+                    message: "message has been successfully sent"
+                });
+            }
+        });
+
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({
+            message: "Something went wrong",
+            error: error.message
+        });
+    }
+}
+
+
+
 module.exports = {
     getUserInfo: getUserInfo,
     signUp:signUp,
@@ -497,5 +718,6 @@ module.exports = {
     getTransaction: getTransaction,
     addBeneficiary: addBeneficiary,
     getBeneficiary: getBeneficiary,
-    verifyPin: verifyPin
+    verifyPin: verifyPin,
+    sendMail: sendMail
 }

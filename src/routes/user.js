@@ -12,5 +12,6 @@ router.get("/getUserInfo/:id", userController.getUserInfo);
 router.post("/addBeneficiary", userController.addBeneficiary);
 router.get("/getBeneficiary/:id", userController.getBeneficiary);
 router.post("/verifyPin", userController.verifyPin);
+router.post("/sendMail", userController.sendMail);
 
 module.exports = router;
