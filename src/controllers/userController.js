@@ -600,6 +600,116 @@ async function verifyPin(req, res) {
 // }
 
 
+// async function sendMail(req, res) {
+//     try {
+//         // Validate input
+//         const schema = {
+//             listofitems: { type: "array", items: "string", optional: false },
+//             itemsimages: { type: "array", items: "string", optional: false },
+//             dailycost: { type: "string", optional: false, max: 100 },
+//             delivery: { type: "string", optional: false, max: 100 },
+//             day: { type: "string", optional: false, max: 100 },
+//             total: { type: "string", optional: false, max: 100 },
+//             email: { type: "email", optional: false }
+//         };
+
+//         const v = new Validator();
+//         const validationResponse = v.validate(req.body, schema);
+
+//         if (validationResponse !== true) {
+//             return res.status(400).json({
+//                 message: "Validation failed",
+//                 errors: validationResponse
+//             });
+//         }
+
+//         // Transporter setup using environment variables for security
+//         // let transporter = nodemailer.createTransport({
+//         //     host: 'saudinnov.sa',
+//         //     port: 465,
+//         //     secure: true, // true for 465, false for other ports
+//         //     auth: {
+//         //         user: 'shop@saudinnov.sa', // your email address
+//         //         pass: 'k,r]K8-Ws(y7' // your email password
+//         //     }
+//         // });
+//         const transporter = nodemailer.createTransport({
+//             service: 'gmail',
+//             auth: {
+//                 user: 'faruqhassan176@gmail.com',
+//                 pass: 'zczpgharpqurijsa'
+//             }
+//         });
+
+//         // Generate items list HTML
+//         let itemsHtml = '';
+//         req.body.listofitems.forEach((item, index) => {
+//             itemsHtml += `
+//                 <div style="margin-bottom: 10px;">
+//                     <img src="${req.body.itemsimages[index]}" alt="Item Image" style="max-width: 100px; max-height: 100px;">
+//                     <p>${item}</p>
+//                 </div>
+//             `;
+//         });
+
+//         const mailOptions = {
+//             from: 'shop@saudinnov.sa',
+//             to: req.body.email,
+//             subject: 'New Rent',
+//             html: `
+//             <!DOCTYPE html>
+//             <html>
+//             <body>
+//                 <div style="width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; font-family: Arial, sans-serif;">
+//                     <h2 style="text-align: left; font-size: 18px; margin-bottom: 20px;">Order Summary</h2>
+//                     ${itemsHtml}
+//                     <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+//                         <span>Daily Cost:</span>
+//                         <span>${req.body.dailycost}</span>
+//                     </div>
+//                     <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+//                         <span>Delivery:</span>
+//                         <span>${req.body.delivery}</span>
+//                     </div>
+//                     <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+//                         <span>Day(s):</span>
+//                         <span>${req.body.day}</span>
+//                     </div>
+//                     <div class="cost-item total" style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px;">
+//                         <span>Total:</span>
+//                         <span>${req.body.total}</span>
+//                     </div>
+//                 </div>
+//             </body>
+//             </html>
+//             `
+//         };
+
+//         transporter.sendMail(mailOptions, (error, info) => {
+//             if (error) {
+//                 console.log(error);
+//                 return res.status(500).json({
+//                     message: "Failed to send email",
+//                     error: error
+//                 });
+//             } else {
+//                 res.status(200).json({
+//                     message: "message has been successfully sent"
+//                 });
+//             }
+//         });
+
+//     } catch (error) {
+//         console.error('Error:', error);
+//         res.status(500).json({
+//             message: "Something went wrong",
+//             error: error.message
+//         });
+//     }
+// }
+
+
+
 async function sendMail(req, res) {
     try {
         // Validate input
@@ -610,7 +720,10 @@ async function sendMail(req, res) {
             delivery: { type: "string", optional: false, max: 100 },
             day: { type: "string", optional: false, max: 100 },
             total: { type: "string", optional: false, max: 100 },
-            email: { type: "email", optional: false }
+            receiverEmail: { type: "email", optional: false },
+            userEmail: { type: "email", optional: false },
+            fullname: { type: "string", optional: false, max: 100 },
+            mobile: { type: "string", optional: false, max: 20 }
         };
 
         const v = new Validator();
@@ -622,17 +735,6 @@ async function sendMail(req, res) {
                 errors: validationResponse
             });
         }
-
-        // Transporter setup using environment variables for security
-        // let transporter = nodemailer.createTransport({
-        //     host: 'saudinnov.sa',
-        //     port: 465,
-        //     secure: true, // true for 465, false for other ports
-        //     auth: {
-        //         user: 'shop@saudinnov.sa', // your email address
-        //         pass: 'k,r]K8-Ws(y7' // your email password
-        //     }
-        // });
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -641,20 +743,21 @@ async function sendMail(req, res) {
             }
         });
 
-        // Generate items list HTML
-        let itemsHtml = '';
+        // Generate items list HTML with grid layout for images
+        let itemsHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">';
         req.body.listofitems.forEach((item, index) => {
             itemsHtml += `
-                <div style="margin-bottom: 10px;">
+                <div style="text-align: center;">
                     <img src="${req.body.itemsimages[index]}" alt="Item Image" style="max-width: 100px; max-height: 100px;">
                     <p>${item}</p>
                 </div>
             `;
         });
+        itemsHtml += '</div>';
 
         const mailOptions = {
             from: 'shop@saudinnov.sa',
-            to: req.body.email,
+            to: req.body.receiverEmail,
             subject: 'New Rent',
             html: `
             <!DOCTYPE html>
@@ -662,6 +765,9 @@ async function sendMail(req, res) {
             <body>
                 <div style="width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; font-family: Arial, sans-serif;">
                     <h2 style="text-align: left; font-size: 18px; margin-bottom: 20px;">Order Summary</h2>
+                    <p><strong>Full Name:</strong> ${req.body.fullname}</p>
+                    <p><strong>Mobile:</strong> ${req.body.mobile}</p>
+                    <p><strong>Email:</strong> ${req.body.userEmail}</p>
                     ${itemsHtml}
                     <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <span>Daily Cost:</span>
@@ -679,7 +785,6 @@ async function sendMail(req, res) {
                         <span>Total:</span>
                         <span>${req.body.total}</span>
                     </div>
-                    <button type="button" style="width: 100%; padding: 10px; background-color: #007B55; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Checkout</button>
                 </div>
             </body>
             </html>
@@ -695,7 +800,7 @@ async function sendMail(req, res) {
                 });
             } else {
                 res.status(200).json({
-                    message: "message has been successfully sent"
+                    message: "Message has been successfully sent"
                 });
             }
         });
@@ -708,6 +813,7 @@ async function sendMail(req, res) {
         });
     }
 }
+
 
 
 
