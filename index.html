@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #f9f9f9;
+                    }
+                    .container {
+                        width: 100%;
+                        margin: 0 auto;
+                        padding: 20px;
+                        background-color: #fff;
+                        border-radius: 8px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+                    .header {
+                        text-align: center;
+                        padding-bottom: 20px;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    .header h2 {
+                        margin: 0;
+                        color: #333;
+                    }
+                    .order-details {
+                        padding: 20px 0;
+                    }
+                    .order-details p {
+                        margin: 5px 0;
+                    }
+                    .items {
+                        margin: 20px 0;
+                    }
+                    .cost-item {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 10px;
+                    }
+                    .total {
+                        font-weight: bold;
+                        margin-top: 10px;
+                        border-top: 1px solid #ddd;
+                        padding-top: 10px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h2>Order Summary</h2>
+                    </div>
+                    <div class="order-details">
+                        <p><strong>Full Name:</strong> ${req.body.fullname}</p>
+                        <p><strong>Mobile:</strong> ${req.body.mobile}</p>
+                        <p><strong>Email:</strong> ${req.body.userEmail}</p>
+                    </div>
+                    <div class="items">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+                            <div style="text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                                <img src="${req.body.itemsimages[index]}" alt="Item Image" style="max-width: 100px; max-height: 100px;">
+                                <p>item 1</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cost-item">
+                        <span>Daily Cost:</span>
+                        <span>${req.body.dailycost}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Delivery:</span>
+                        <span>${req.body.delivery}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Day(s):</span>
+                        <span>${req.body.day}</span>
+                    </div>
+                    <div class="cost-item total">
+                        <span>Total:</span>
+                        <span>${req.body.total}</span>
+                    </div>
+                </div>
+            </body>
+            </html>

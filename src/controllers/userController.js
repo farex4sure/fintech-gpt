@@ -756,16 +756,12 @@ async function sendMail(req, res) {
         });
 
         // Generate items list HTML with grid layout for images
-        let itemsHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">';
-        req.body.listofitems.forEach((item, index) => {
+        let itemsHtml = '';
+        req.body.itemsimages.forEach((image, index) => {
             itemsHtml += `
-                <div style="text-align: center;">
-                    <img src="${req.body.itemsimages[index]}" alt="Item Image" style="max-width: 100px; max-height: 100px; display: block; margin: 0 auto;">
-                    <p>${item}</p>
-                </div>
+                <img src="${image}" alt="Item Image" style="max-width: 100px; max-height: 100px; margin: 5px;">
             `;
         });
-        itemsHtml += '</div>';
 
         const mailOptions = {
             from: 'shop@saudinnov.sa',
@@ -774,28 +770,75 @@ async function sendMail(req, res) {
             html: `
             <!DOCTYPE html>
             <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 20px;
+                        background-color: #f9f9f9;
+                    }
+                    .container {
+                        width: 100%;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 20px;
+                        background-color: #fff;
+                        border-radius: 8px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+                    .header {
+                        text-align: center;
+                        padding-bottom: 20px;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    .header h2 {
+                        margin: 0;
+                        color: #333;
+                    }
+                    .customer-info, .order-items, .order-details {
+                        margin: 20px 0;
+                    }
+                    .customer-info p, .order-details p {
+                        margin: 5px 0;
+                    }
+                    .order-items img {
+                        margin: 5px;
+                    }
+                    .order-details p {
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    .total {
+                        font-weight: bold;
+                        margin-top: 10px;
+                        border-top: 1px solid #ddd;
+                        padding-top: 10px;
+                    }
+                </style>
+            </head>
             <body>
-                <div style="width: 900px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; font-family: Arial, sans-serif;">
-                    <h2 style="text-align: left; font-size: 18px; margin-bottom: 20px;">Order Summary</h2>
-                    <p><strong>Full Name:</strong> ${req.body.fullname}</p>
-                    <p><strong>Mobile:</strong> ${req.body.mobile}</p>
-                    <p><strong>Email:</strong> ${req.body.userEmail}</p>
-                    ${itemsHtml}
-                    <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>Daily Cost:</span>
-                        <span>${req.body.dailycost}</span>
+                <div class="container">
+                    <div class="header">
+                        <h2>Order Summary</h2>
                     </div>
-                    <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>Delivery:</span>
-                        <span>${req.body.delivery}</span>
+                    <div class="customer-info">
+                        <h3>Customer Info</h3>
+                        <p><strong>Full Name:</strong> ${req.body.fullname}</p>
+                        <p><strong>Mobile:</strong> ${req.body.mobile}</p>
+                        <p><strong>Email:</strong> ${req.body.userEmail}</p>
                     </div>
-                    <div class="cost-item" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>Day(s):</span>
-                        <span>${req.body.day}</span>
+                    <div class="order-items">
+                        <h3>Order Items</h3>
+                        <p>${req.body.listofitems.join(', ')}</p>
+                        <div>${itemsHtml}</div>
                     </div>
-                    <div class="cost-item total" style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px;">
-                        <span>Total:</span>
-                        <span>${req.body.total}</span>
+                    <div class="order-details">
+                        <h3>Order Details</h3>
+                        <p><strong>Daily Cost:</strong> <span>SAR ${req.body.dailycost}</span></p>
+                        <p><strong>Delivery:</strong> <span>SAR ${req.body.delivery}</span></p>
+                        <p><strong>Day(s):</strong> <span>${req.body.day}</span></p>
+                        <p class="total"><strong>Total:</strong> <span>SAR ${req.body.total}</span></p>
                     </div>
                 </div>
             </body>
