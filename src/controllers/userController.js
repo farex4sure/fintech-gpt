@@ -763,7 +763,7 @@ async function sendMail(req, res) {
             <!DOCTYPE html>
             <html>
             <body>
-                <div style="width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; font-family: Arial, sans-serif;">
+                <div style="width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; font-family: Arial, sans-serif;">
                     <h2 style="text-align: left; font-size: 18px; margin-bottom: 20px;">Order Summary</h2>
                     <p><strong>Full Name:</strong> ${req.body.fullname}</p>
                     <p><strong>Mobile:</strong> ${req.body.mobile}</p>
