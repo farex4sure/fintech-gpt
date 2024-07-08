@@ -748,7 +748,7 @@ async function sendMail(req, res) {
         req.body.listofitems.forEach((item, index) => {
             itemsHtml += `
                 <div style="text-align: center;">
-                    <img src="${req.body.itemsimages[index]}" alt="Item Image" style="max-width: 100px; max-height: 100px;">
+                    <img src="${req.body.itemsimages[index]}" alt="Item Image" style="max-width: 100px; max-height: 100px; display: block; margin: 0 auto;">
                     <p>${item}</p>
                 </div>
             `;
