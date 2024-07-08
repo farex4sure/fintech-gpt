@@ -736,23 +736,24 @@ async function sendMail(req, res) {
             });
         }
 
-                // Transporter setup using environment variables for security
-        let transporter = nodemailer.createTransport({
-            host: 'saudinnov.sa',
-            port: 465,
-            secure: true, // true for 465, false for other ports
+        //         // Transporter setup using environment variables for security
+//         let transporter = nodemailer.createTransport({
+//             host: 'saudinnov.sa',
+//             port: 465,
+//             secure: true, // true for 465, false for other ports
+//             auth: {
+//                 user: 'shop@saudinnov.sa', // your email address
+//                 pass: 'k,r]K8-Ws(y7' // your email password
+//             }
+//         });
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
             auth: {
-                user: 'shop@saudinnov.sa', // your email address
-                pass: 'k,r]K8-Ws(y7' // your email password
+                user: 'faruqhassan176@gmail.com',
+                pass: 'zczpgharpqurijsa'
             }
         });
-        // const transporter = nodemailer.createTransport({
-        //     service: 'gmail',
-        //     auth: {
-        //         user: 'faruqhassan176@gmail.com',
-        //         pass: 'zczpgharpqurijsa'
-        //     }
-        // });
 
         // Generate items list HTML with grid layout for images
         let itemsHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">';
