@@ -25,6 +25,14 @@ async function getUserInfo(req, res) {
             where: { userid: id }
         });
 
+        if (!users) {
+            return res.status(404).json({
+              responseSuccessful: false,
+              responseMessage: "User not found",
+              responseBody: []
+            });
+        }
+
         // User beneficiary
         const beneficiaries = await models.beneficiary.findAll({
             where: { userid: id },
@@ -45,6 +53,13 @@ async function getUserInfo(req, res) {
 
         // User transactions
         const getUserAccount = await models.user.findOne({ where: { userid: id } });
+
+        // Check if user account exists
+        if (!getUserAccount) {
+            return res.status(404).json({
+                message: "User account not found"
+            });
+        }
 
         const transactions = await models.transaction.findAll({
             where: {
